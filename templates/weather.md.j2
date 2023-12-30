@@ -1,0 +1,19 @@
+# {{ title }}
+
+## Weather
+
+| - | Today | Tomorrow |
+| - | ----- | -------- |
+| L/H | {{ weather['today']['low'] }}/{{ weather['today']['high'] }} | {{ weather['tomorrow']['low'] }}/{{ weather['tomorrow']['high'] }} |
+| CoR | 12 | 38 |
+
+## Sunrise/Sunset
+
+| **Dawn** | {{ risenset['dawn'] }} |
+| ----- | ---- |
+| **Sunrise**|  {{ risenset['sunrise'] }} |
+| **Solar Noon**|  {{ risenset['solar_noon'] }} |
+| **Golden Hour**|  {{ risenset['golden_hour'] }} |
+| **Sunset** | {{ risenset['sunset'] }} |
+| **Dusk** | {{ risenset['dusk'] }} |
+| **Length of Day**|  {{ risenset['day_length'] }} |
