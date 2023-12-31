@@ -7,6 +7,7 @@ import requests
 import json
 from beartype import beartype
 from jinja2 import Environment, PackageLoader, select_autoescape
+from nfl import NFL
 
 class RupertReport():
 	"""
@@ -68,14 +69,14 @@ class RupertReport():
 			settings_json = settings.read()
 		self.settings = json.loads(settings_json)
 
-class DailyRupertReport(RupertReport):
+class RupertReportWeather(RupertReport):
 	"""
 		Description: Class for generating daily news/updates
 	"""
 
 	@beartype
 	def build(self, template_file, saved_output) -> None:
-		self.data_dictionary['title'] = 'Daily Updates'
+		self.data_dictionary['title'] = 'Weather'
 		self.data_dictionary['risenset'] = self.rise_n_set(self.settings['location']['longitude'], self.settings['location']['latitude'])
 		self.data_dictionary['weather'] = {}
 		self.data_dictionary['weather']['today'] = self.weather(self.settings['location']['longitude'], self.settings['location']['latitude'])
@@ -114,3 +115,21 @@ class DailyRupertReport(RupertReport):
 		weather['low'] = 43
 		weather['cor'] = 12
 		return weather
+
+class RupertReportSports(RupertReport):
+	"""
+		Description: Class for generating daily sports info
+	"""
+
+	@beartype
+	def build(self, template_file, saved_output) -> None:
+		self.data_dictionary['title'] = 'Sports'
+		self.data_dictionary['nfl'] = self.__nfl()
+		print(self.data_dictionary)
+		super().build(template_file, saved_output)
+
+	@beartype
+	def __nfl(self) -> dict:
+		""" Build NFL info """
+		nfl = NFL(self.settings)
+		return nfl.get_my_teams()
