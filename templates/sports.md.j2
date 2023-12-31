@@ -4,6 +4,7 @@
 
 {% for team in nfl %}
 ### {{ nfl[team].name }} {{ nfl[team].record }}
-- Last: {{ nfl[team].last }}
-- Next: {{ nfl[team].next }}
+| **Last:** {{ nfl[team].last }} |
+| ----------------------------- |
+| **Next:** {{ nfl[team].next }} |
 {% endfor %}

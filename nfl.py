@@ -40,7 +40,7 @@ class NFL():
 				else:
 					last = game
 			
-			my_teams[team_abbr]['last'] = f"{last.date} {last.opponent_name}: {last.result}"
+			my_teams[team_abbr]['last'] = f"{last.date} {last.opponent_name} - {last.result}"
 			my_teams[team_abbr]['next'] = f"{next.date} {next.opponent_name}: {self.teams[next.opponent_abbr].wins} - {self.teams[next.opponent_abbr].losses} @ {next.location}"
 
 		print(my_teams)
