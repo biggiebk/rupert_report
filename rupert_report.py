@@ -7,7 +7,7 @@ import requests
 import json
 from beartype import beartype
 from jinja2 import Environment, PackageLoader, select_autoescape
-from nfl import NFL
+from sports import NFL, NBA
 
 class RupertReport():
 	"""
@@ -125,6 +125,7 @@ class RupertReportSports(RupertReport):
 	def build(self, template_file, saved_output) -> None:
 		self.data_dictionary['title'] = 'Sports'
 		self.data_dictionary['nfl'] = self.__nfl()
+		self.data_dictionary['nba'] = self.__nba()
 		print(self.data_dictionary)
 		super().build(template_file, saved_output)
 
@@ -133,3 +134,9 @@ class RupertReportSports(RupertReport):
 		""" Build NFL info """
 		nfl = NFL(self.settings)
 		return nfl.get_my_teams()
+	
+	@beartype
+	def __nba(self) -> dict:
+		""" Build NBA info """
+		nba = NBA(self.settings)
+		return nba.get_my_teams()

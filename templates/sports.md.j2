@@ -8,3 +8,12 @@
 | ----------------------------- |
 | **Next:** {{ nfl[team].next }} |
 {% endfor %}
+
+## NBA
+
+{% for team in nba %}
+### {{ nba[team].name }} {{ nba[team].record }}
+| **Last:** {{ nba[team].last }} |
+| ----------------------------- |
+| **Next:** {{ nba[team].next }} |
+{% endfor %}
