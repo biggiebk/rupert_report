@@ -78,9 +78,7 @@ class RupertReportWeather(RupertReport):
 	def build(self, template_file, saved_output) -> None:
 		self.data_dictionary['title'] = 'Weather'
 		self.data_dictionary['risenset'] = self.rise_n_set(self.settings['location']['longitude'], self.settings['location']['latitude'])
-		self.data_dictionary['weather'] = {}
-		self.data_dictionary['weather']['today'] = self.weather(self.settings['location']['longitude'], self.settings['location']['latitude'])
-		self.data_dictionary['weather']['tomorrow'] = self.weather(self.settings['location']['longitude'], self.settings['location']['latitude'])
+		self.data_dictionary['weather'] = self.weather(self.settings['location']['longitude'], self.settings['location']['latitude'])
 		print(self.data_dictionary)
 		super().build(template_file, saved_output)
 
@@ -105,15 +103,65 @@ class RupertReportWeather(RupertReport):
 
 	@beartype
 	def weather(self, longitude: float, latitude: float):
-		# https://api.weather.gov/points/38.06355895008784%2C-122.16322946135749
+		session = requests.Session()
+		session.headers.update({'User-Agent': self.settings['web']['user-agent']})
+		# Get the grid ifno
+		print((f"Retrieve Grid: https://api.weather.gov/points/{self.settings['location']['latitude']}%2C{self.settings['location']['longitude']}"))
+		results = session.get(f"https://api.weather.gov/points/{self.settings['location']['latitude']}%2C{self.settings['location']['longitude']}")
+		location_data = json.loads(results.content)
 
-		#ID STO X 13 Y 50
-		#https://api.weather.gov/gridpoints/STO/13,50
+		# Get the hourly forcasts
+		print(f"Hourly Forcast: {location_data['properties']['forecastHourly']}")
+		results = session.get(location_data['properties']['forecastHourly'])
+		data = json.loads(results.content)
+
+		# Get the high, low, and chance of rain for today
+		weather = {}
+		weather['today'] = self.__get_hlr(data['properties']['periods'], 0, 23)
+		weather['tomorrow'] = self.__get_hlr(data['properties']['periods'], 24, 47)
+		print(f"Today High: {weather['today']['high']} Low:: {weather['today']['low']} COR: {weather['today']['cor']}")
+
+		# Get the moring and night detailed forcasts
+		# Todays forcast
+		print(f"12 Hour Forcast: {location_data['properties']['forecast']}")
+		results = session.get(location_data['properties']['forecast'])
+		data = json.loads(results.content)
+		weather['today']['detailedforcast'] = self.__get_detailed(data['properties']['periods'], 0)
+		weather['tomorrow']['detailedforcast'] = self.__get_detailed(data['properties']['periods'], 2)
+
+		data = json.loads(results.content)
+
+		return weather
+
+## Private
+
+
+	def __get_detailed(self, periods: dict, day: int) -> dict:
+		forcast = {}
+		forcast['day'] = periods[day]['detailedForecast']
+		forcast['night'] = periods[day + 1]['detailedForecast']
+		return forcast
+
+	def __get_hlr(self, periods: dict, start: int, end: int) -> dict:
+		# Get the high, low, and chance of rain for today
+		low = periods[start]['temperature']
+		high = periods[start]['temperature']
+		c_o_r = 0
+		for period in range(start, end):
+			if periods[period]['temperature'] < low:
+				print(f"L {periods[period]['temperature']} < {low}")
+				low = periods[period]['temperature']
+			if periods[period]['temperature'] > high:
+				print(f"G {periods[period]['temperature']} > {high}")
+				high = periods[period]['temperature']
+			if periods[period]['probabilityOfPrecipitation']['value'] > c_o_r:
+				c_o_r = periods[period]['probabilityOfPrecipitation']['value']
+			print(f"  {periods[period]['shortForecast']}")
 
 		weather = {}
-		weather['high'] = 58
-		weather['low'] = 43
-		weather['cor'] = 12
+		weather['high'] = high
+		weather['low'] = low
+		weather['cor'] = c_o_r
 		return weather
 
 class RupertReportSports(RupertReport):

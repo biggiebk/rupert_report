@@ -5,7 +5,9 @@
 | - | Today | Tomorrow |
 | - | ----- | -------- |
 | L/H | {{ weather['today']['low'] }}/{{ weather['today']['high'] }} | {{ weather['tomorrow']['low'] }}/{{ weather['tomorrow']['high'] }} |
-| CoR | 12 | 38 |
+| CoR | {{ weather['today']['cor'] }} | {{ weather['tomorrow']['cor'] }} |
+| Day | {{ weather['today']['detailedforcast']['day'] }} | {{ weather['tomorrow']['detailedforcast']['day'] }} |
+| Night | {{ weather['today']['detailedforcast']['night'] }} | {{ weather['tomorrow']['detailedforcast']['night'] }} |
 
 ## Sunrise/Sunset
 
